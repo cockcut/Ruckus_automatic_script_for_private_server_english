@@ -4,7 +4,7 @@
 
 # This script is for a server connected to a private network.
 
-# Install git with "dnf install git"
+# Install git,httpd with "dnf install git httpd"
 # After downloading with "git clone", grant execute permissions to the script files (.sh) by running a script.
 
 0) Rename folder name(
