@@ -7,6 +7,9 @@
 # Install git with "dnf install git"
 # After downloading with "git clone", grant execute permissions to the script files (.sh) by running a script.
 
+0) Rename folder name(
+------> mv Ruckus_automatic_script_for_private_server_english "youre web folder"
+
 1) chmod +x chmod.sh 
 ------> Grants execute permission to chmod.sh.
 
