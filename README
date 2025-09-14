@@ -1,5 +1,7 @@
 # Ruckus_script_for_Private_SERVER
 
+#This was written based on Rocky Linux 8
+
 # This script is for a server connected to a private network.
 
 # Install git with "dnf install git"
