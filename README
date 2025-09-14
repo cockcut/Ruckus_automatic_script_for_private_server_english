@@ -10,6 +10,13 @@
 0) Rename folder name(
 ------> mv Ruckus_automatic_script_for_private_server_english "youre web folder"
 
+ex) 
+on /var/www/html, git clone "git repo-url"
+mv Ruckus_automatic_script_for_private_server_english private
+cd private
+pwd
+/var/www/html/private
+
 1) chmod +x chmod.sh 
 ------> Grants execute permission to chmod.sh.
 
