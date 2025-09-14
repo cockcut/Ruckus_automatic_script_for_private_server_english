@@ -38,6 +38,7 @@ Authentication page for SZ.
 
 # [ fw ]
 After uploading the AP firmware to /var/www/html/private/fw (regardless of standalone or Unleashed),
+You have to modify the variables inside fw.sh to match your environment. After uploading the AP's firmware to the corresponding folder (./fw), you must run ./fw.sh for the page to open.
 
 Run vi /fw/fw.sh and modify the following section to fit your environment. (# is a comment)
 
