@@ -1,0 +1,4 @@
+ip,user,pass,fw_server_ip
+10.10.10.10,super,sp-admin,192.168.0.100
+10.10.20.20,super,sp-admin,192.168.0.100
+10.10.200.200,super,sp-admin,192.168.0.100

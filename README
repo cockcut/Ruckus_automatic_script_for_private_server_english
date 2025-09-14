@@ -1,0 +1,89 @@
+# Ruckus_script_for_Private_SERVER
+
+# This script is for a server connected to a private network.
+
+# Install git with "dnf install git"
+# After downloading with "git clone", grant execute permissions to the script files (.sh) by running a script.
+
+1) chmod +x chmod.sh 
+------> Grants execute permission to chmod.sh.
+
+2) ./chmod.sh
+------> Executes chmod.sh to grant execute permissions to all script files (*.sh).
+------> Grants execute permission to the Unleashed API folder (api-u).
+------> Grants execute permission to the supported folder.
+------> Schedules the oui script in crontab (to run daily at 00:00) and grants it execute permission.
+------> Installs other necessary programs, registers firewall rules, and changes PHP upload settings, etc.
+
+# [ api-u ]
+Can extract and save AP information, SSID, and BSSID information from an Unleashed AP.
+
+# [ api ]
+Can extract and save AP information, SSID, BSSID, and Switch information from SmartZone (both SZ and vSZ are supported).
+
+# [ captiveportal ]
+Authentication page for SZ.
+
+# [ fw ]
+After uploading the AP firmware to /var/www/html/private/fw (regardless of standalone or Unleashed),
+
+Run vi /fw/fw.sh and modify the following section to fit your environment. (# is a comment)
+
+User-defined variables
+#SERVER_IP="localhost.com" or "1.1.1.1" needed for webpage link.
+SERVER_IP="www.localhost.com"
+SERVER_PORT="80"
+
+#OUTPUT_PATH="/var/www/html/fw" etc. Specify the web folder where firmware files are located.
+OUTPUT_PATH="/var/www/html/fw"
+
+#LOCATION_PATH="/var/www/html/fw" etc. This extracts only "fw" from the web folder path by removing "/var/www/html/". Do not modify this.
+LOCATION_PATH=${OUTPUT_PATH#/var/www/html/}
+
+#FW_HOST="1.1.1.1" is the actual server IP for the AP's CLI command (a URL can be used, but the AP's DNS IP must be set).
+FW_HOST="1.1.1.1"
+
+After running, access http://xxxx/fw to open the firmware script page.
+(Provides a script that directly downloads and upgrades from a private server.)
+
+Access the AP via SSH and copy and paste. (From fw set to set factory below)
+
+   -------------------------------------------------------
+   H350
+   -------------------------------------------------------
+   fw set proto http
+   fw set port 80
+   fw set host 1.1.1.1
+   fw set control fw/H350_v11x_cntrl.rcks
+   fw update
+   set factory
+   -------------------------------------------------------
+
+# [ oui ]
+Schedule oui extraction script to run daily at 00:00.
+
+Access http://xxxx/oui/oui.txt to open the OUI page.
+
+# [ portal ]
+Portal page on a private network server.
+
+# [ psk ]
+A page that uses the SZ API to individually or batch modify PSK/SAE passphrases.
+
+# [ script ]
+Download and modify sample.csv then upload it.
+
+1) 다수의 AP IP 변경
+┌▶ Change current_ip to new_IP, subnet, and g/w.
+└▶ Configure SZ IP and apply AP's hostname.
+
+# [ snmp ]
+A page that uses SNMP to show the ARP table of an ICX switch.
+
+# [ supported ]
+A page that extracts and shows supported models per controller from the Ruckus website.
+
+# [ upgrade ]
+Download and modify fw_sample.csv then upload it.
+┌▶ Uploading standalone firmware upgrades from Unleashed to standalone firmware.
+└▶ Uploading Unleashed firmware upgrades from standalone to Unleashed firmware.

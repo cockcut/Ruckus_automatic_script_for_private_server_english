@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruckus Supported Device List</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            width: 1000px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            
+            /* Added flexbox for button centering */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .btn-link {
+            display: block;
+            width: 500px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+        }
+
+        .btn-link:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-link:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+        }
+
+        /* Set color for each link */
+        .unleashed-link {
+            background-color: #28a745;
+            box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+        }
+        .unleashed-link:hover {
+            background-color: #218838;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .smartzone-link {
+            background-color: #ffc107;
+            box-shadow: 0 2px 5px rgba(255, 193, 7, 0.2);
+        }
+        .smartzone-link:hover {
+            background-color: #e0a800;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+        }
+
+        .menu-link {
+            display: inline-block;
+            margin: 5px 0;
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #007bff;
+            transition: background-color 0.3s;
+        }
+        .menu-link:hover {
+            background-color: #e2e6ea;
+        }
+        
+        /* Add new class */
+        .header-links {
+            width: 1000px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+
+
+<div class="container">
+	<div class="header-links">
+		<a href="../portal/index.php" class="menu-link">☎ HOME</a>
+	</div>
+    <h1>RUCKUS Supported Device List</h1>
+    <a href="./uap.php" class="btn-link unleashed-link">Unleashed version specific AP support</a>
+    <a href="./sz.php" class="btn-link smartzone-link">SmartZone version specific AP support</a>
+    <a href="./r1.php" class="btn-link">R1 Supported AP</a>
+</div>
+
+</body>
+</html>

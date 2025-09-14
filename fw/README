@@ -1,0 +1,13 @@
+vi /fw/fw.sh
+
+The following part needs to be modified according to your environment.
+# User-defined variables
+#SERVER_IP="localhost.com" or "1.1.1.1" needed for webpage link.
+SERVER_IP="www.localhost.com"
+SERVER_PORT="80"
+#OUTPUT_PATH="/var/www/html/fw" etc. specify the web folder containing firmware files
+OUTPUT_PATH="/var/www/html/fw"
+#LOCATION_PATH="/var/www/html/fw" etc. Extract only 'fw' from the web folder containing firmware files and use it in the script. Do not modify.
+LOCATION_PATH=${OUTPUT_PATH#/var/www/html/}
+#FW_HOST="1.1.1.1" is the actual server IP for the AP's cli command (can be a URL, but AP must have DNS IP set).
+FW_HOST="1.1.1.1"
