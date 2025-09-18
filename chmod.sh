@@ -60,6 +60,7 @@ sudo systemctl restart php-fpm
 sudo firewall-cmd --permanent --add-service=http
 sudo firewall-cmd --reload
 
-# Allow SElinux
+# --- Allow SElinux ---
 setenforce 0
-sudo sed -i 's/^SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+# --- SELINUX=enforcing 일 경우에만 SELINUX=permissive로 변경 ---
+sudo sed -i '/^SELINUX=enforcing/s/enforcing/permissive/' /etc/selinux/config
