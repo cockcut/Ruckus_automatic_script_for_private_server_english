@@ -19,7 +19,7 @@ proc upgrade_ap {ip model version fw_server_ip fwname} {
 	puts "Upgrading AP $ip ($model) from version $version"
 	send "fw set proto HTTP\r"
 	expect "OK"
-	send "fw set port 8080\r"
+	send "fw set port 80\r"
 	expect "OK"
 	send "fw set host $fw_server_ip\r"
 	expect "OK"
@@ -309,5 +309,6 @@ while {[gets $fp line] != -1} {
 close $fp
 
 puts "\n※ Script finished.\n"
+
 
 
