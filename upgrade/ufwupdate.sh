@@ -25,7 +25,7 @@ proc upgrade_ap {ip model version fw_server_ip fwname} {
 	expect "OK"
 	send "fw set host $fw_server_ip\r"
 	expect "OK"
-	send "fw set control $fw_path/uploads/$fwname\r"
+	send "fw set control $fw_path/$fwname\r"
 	expect "OK"
 	send "fw update\r"
 	set timeout 180
@@ -311,6 +311,7 @@ while {[gets $fp line] != -1} {
 close $fp
 
 puts "\n※ Script finished.\n"
+
 
 
 
