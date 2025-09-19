@@ -14,12 +14,10 @@ set timeout 5
 set filename [lindex $argv 0]
 set fwname [lindex $argv 1]
 
-# Path parsing
-set full_path [exec pwd]
-set fw_path [string trimleft $full_path "/var/www/html/"]
-
 # Define firmware upgrade logic as a separate procedure
 proc upgrade_ap {ip model version fw_server_ip fwname} {
+    set full_path [exec pwd]
+    set fw_path [string trimleft $full_path "/var/www/html/"]
     puts "Upgrading AP $ip ($model) from version $version"
     send "fw set proto HTTP\r"
     expect "OK"
