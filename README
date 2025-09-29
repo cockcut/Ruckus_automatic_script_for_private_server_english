@@ -4,28 +4,26 @@
 
 # This script is for a server connected to a private network.
 
-# Install git,httpd with "dnf -y install git httpd"
-# After downloading with "git clone", grant execute permissions to the script files (.sh) by running a script.
+# Install git and httpd using dnf install git httpd.
+# After downloading the repository via git clone, grant execution permissions to the script files (*.sh) and run the permission setup script.
+# Example git clone command: git clone git@github.com:cockcut/Ruckus_script_for_Private_SERVER.git "your web folder"
 
-0) Rename folder name(
-------> mv Ruckus_automatic_script_for_private_server_english "youre web folder"
+1) Single-line command:
 
-ex) 
-on /var/www/html, git clone "git repo-url"
-mv Ruckus_automatic_script_for_private_server_english private
+cd /var/www/html
+git clone git@github.com:cockcut/Ruckus_script_for_Private_SERVER.git private; cd private; chmod +x chmod.sh; ./chmod.sh
+
+2) Commands entered line by line:
+
+cd /var/www/html
+git clone git@github.com:cockcut/Ruckus_script_for_Private_SERVER.git private
 cd private
-pwd
-/var/www/html/private
-
-1) chmod +x chmod.sh 
-------> Grants execute permission to chmod.sh.
-
-2) ./chmod.sh
-------> Executes chmod.sh to grant execute permissions to all script files (*.sh).
-------> Grants execute permission to the Unleashed API folder (api-u).
-------> Grants execute permission to the supported folder.
-------> Schedules the oui script in crontab (to run daily at 00:00) and grants it execute permission.
-------> Installs other necessary programs, registers firewall rules, and changes PHP upload settings, etc.
+chmod +x chmod.sh      --▶ Grant execution permission to chmod.sh
+./chmod.sh
+   ┌▶ Execute chmod.sh to grant execution permissions to all script files 
+   |▶ Grant execution permissions to folder.
+   |▶ Schedule oui script in crontab (daily at 00:00) and grant execution permissions
+   └▶ Install essential programs, register firewall rules, modify PHP upload settings, start web service, etc.
 
 # [ api-u ]
 Can extract and save AP information, SSID, and BSSID information from an Unleashed AP.
