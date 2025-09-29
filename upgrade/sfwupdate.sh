@@ -63,7 +63,7 @@ proc upgrade_ap {ip model version fw_server_ip fwname} {
     expect {
         # Check for immediate errors or failures within 5 seconds
         -re {.*Control File Download Error.*|.*cannot connect to remote host.*rkscli} {
-            set status_msg "Please ensure port 8080 on the PC is open."
+            set status_msg "Please ensure port 80 on the server is open."
             puts "$ip $status_msg"
             log_result $ip $status_msg
             set timeout 5
