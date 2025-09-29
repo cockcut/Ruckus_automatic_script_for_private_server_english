@@ -25,6 +25,8 @@ chmod +x chmod.sh      --▶ Grant execution permission to chmod.sh
    |▶ Schedule oui script in crontab (daily at 00:00) and grant execution permissions
    └▶ Install essential programs, register firewall rules, modify PHP upload settings, start web service, etc.
 
+######## Folder Descriptions ########
+
 # [ api-u ]
 Can extract and save AP information, SSID, and BSSID information from an Unleashed AP.
 
