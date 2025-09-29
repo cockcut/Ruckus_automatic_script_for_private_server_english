@@ -48,7 +48,7 @@ proc upgrade_ap {ip model version fw_server_ip fwname} {
     # Configure firmware settings
     send "fw set proto HTTP\r"
     expect "OK"
-    send "fw set port 8080\r"
+    send "fw set port 80\r"
     expect "OK"
     send "fw set host $fw_server_ip\r"
     expect "OK"
