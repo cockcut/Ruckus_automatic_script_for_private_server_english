@@ -8,7 +8,7 @@ if (isset($_GET['reset'])) {
     $csv_upload_message = "🔄 Previous upload content has been reset. Please upload a new CSV file.";
 }
 
-$upload_dir = 'Uploads/';
+$upload_dir = 'uploads/';
 if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0777, true);
 }
@@ -379,3 +379,4 @@ if (isset($_GET['run_script'])) {
 
 </body>
 </html>
+
