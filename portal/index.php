@@ -106,20 +106,23 @@
 	<p>
         <a href="../upgrade/upgrade.php" class="menu-item">[ 5. Upgrade AP firmware ]</a>
     </p>
-		<p>
+	<p>
         <a href="../fw/index.html" class="menu-item">[ 6. Upgrade AP firmware (paste script) ]</a>
     </p>
-    <p>
-        <a href="../snmp/index.php" class="menu-item">[ 7. View ICX ARP (using snmp) ]</a>
+	<p>
+        <a href="../upgrade2sz/upgrade2sz.php" class="menu-item">[ 7. Upgrade AP with SZ firmware and establish connection to SZ ]</a>
     </p>
     <p>
-        <a href="../oui/oui.txt" class="menu-item">[ 8. View OUI (updated daily)]</a>
+	    <a href="../snmp/index.php" class="menu-item">[ 8. View ICX ARP (using snmp) ]</a>
     </p>
     <p>
-        <a href="../captiveportal/" class="menu-item">[ 9. Web Authentication Page]</a>
+        <a href="../oui/oui.txt" class="menu-item">[ 9. View OUI (updated daily)]</a>
+    </p>
+    <p>
+        <a href="../captiveportal/" class="menu-item">[ 10. Web Authentication Page]</a>
     </p>
 	<p>
-		<a href="../supported/" class="menu-item">[ 10. Check Supported Models for SmartZone, Unleashed, R1]</a>
+		<a href="../supported/" class="menu-item">[ 11. Check Supported Models for SmartZone, Unleashed, R1]</a>
     </p>
 
     <div class="note">
@@ -160,10 +163,19 @@
         </ul>
     </div>
 
+	<div class="note">
+        <div class="note-title">☞ Note</div>
+			<p>For [ 7. Upgrade AP with SZ firmware and establish connection to SZ ]</p>
+        <ul class="note-list">
+            <li>0) Check/Inquire available firmware versions by ZONE in the SZ</li>
+            <li>1) After checking, select the version to upgrade the AP's firmware to the SZ's firmware, then establish connection to SZ, and change the hostname and IP address. The execution result can be downloaded as a CSV</li>
+        </ul>
+    </div>
+
     <div class="note">
         <div class="note-title">☞ Note</div>
         <ul class="note-list">
-			<p>For [ 7. View ICX ARP ]</p>
+			<p>For [ 8. View ICX ARP ]</p>
             <li>0) You must set 'snmp-server community xxxx ro' on the ICX.</li>
             <li>1) After viewing, you can print the current ARP list and download it as a CSV.</li>
         </ul>
@@ -171,7 +183,7 @@
 	
     <div class="note">
         <div class="note-title">☞ Note</div>
-			<p>For [ 8. View OUI ], it downloads and updates the IEEE OUI daily at 00:00.</p>
+			<p>For [ 9. View OUI ], it downloads and updates the IEEE OUI daily at 00:00.</p>
         <ul class="note-list">
         </ul>
     </div>
