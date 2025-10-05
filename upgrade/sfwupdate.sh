@@ -20,12 +20,13 @@ set result_file_path [lindex $argv 2] ;# Result file path
 # 1. Open result file in write mode ('w')
 set result_fp [open $result_file_path w]
 
-# 2. Explicitly set channel encoding to UTF-8 (critical)
-fconfigure $result_fp -encoding utf-8
+# 2. Explicitly set channel encoding to UTF-8 (critical) -> commnet at centos, Rocky.
+#fconfigure $result_fp -encoding utf-8
 
-# 3. Write BOM character \uFEFF
+# 3. Write BOM character \uFEFF -> \xEF\xBB\xBF at centos, Rocky.
 #    Tcl outputs this as 0xEF 0xBB 0xBF (3 bytes) in UTF-8, recognized by Excel
-puts -nonewline $result_fp "\uFEFF"
+#puts -nonewline $result_fp "\uFEFF"
+puts -nonewline $result_fp "\xEF\xBB\xBF"
 
 # 4. Write CSV header
 puts $result_fp "IP,Result_Message"
@@ -33,7 +34,6 @@ puts $result_fp "IP,Result_Message"
 # 5. Close file and reopen in append mode ('a') with UTF-8 encoding
 close $result_fp
 set result_fp [open $result_file_path a]
-fconfigure $result_fp -encoding utf-8
 # =========================================================
 
 # Function to log results to CSV
@@ -100,6 +100,7 @@ proc upgrade_ap {ip model version fw_server_ip fwname} {
             log_result $ip $status_msg
             return 1
         }
+        
         # Upgrade completed (success)
         -re {fw\([0-9]+\) : Completed} {
             set status_msg "Upgrade completed, resetting and rebooting AP."
@@ -114,6 +115,7 @@ proc upgrade_ap {ip model version fw_server_ip fwname} {
             set timeout 5
             return 0
         }
+        
         # Timeout after 180 seconds (slow or failed)
         timeout {
             set status_msg "Firmware update did not complete within 180 seconds. Check network and file availability."
@@ -182,6 +184,7 @@ while {[gets $fp line] != -1} {
     # Handle login scenarios
     expect {
         # 0) Unleashed device
+        #0-0) on running Unleashed mode
         -re "ruckus>" {
             send "enable\r"
             expect {
@@ -256,7 +259,8 @@ while {[gets $fp line] != -1} {
                     }
                 }			
             }		
-        }	
+        }
+        
         # 1) Correct password
         -re "rkscli" {
             send "get version\r"
