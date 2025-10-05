@@ -114,19 +114,6 @@ if (file_exists($data_file)) {
     table-layout: fixed;
 }
 
-									 
-							 
-															  
-									   
-					 
-			   
-  
-
-						   
-				  
-							
-  
-
 /* Basic style */
 .ap-table td, .ap-table th {
     border: 1px solid #ddd;
@@ -154,13 +141,7 @@ if (file_exists($data_file)) {
 
 /* Hover effect */
 .ap-table tbody tr:hover {
-					 
-				  
-				  
-    background-color: #e6e6e6;
-			   
-			   
-					 
+    background-color: #e6e6e6;					 
 }
 
 /* Refresh button style */
@@ -174,16 +155,8 @@ if (file_exists($data_file)) {
     border-radius: 5px;
 }
 
-.refresh-button:hover {
-						
-				
-					
-    background-color: #0056b3;
-							
-					 
-						
-				 
-									
+.refresh-button:hover {		
+    background-color: #0056b3;								
 }
 
 /* Menu link style */
@@ -250,4 +223,5 @@ if (file_exists($data_file)) {
 
 </body>
 </html>
+
 
