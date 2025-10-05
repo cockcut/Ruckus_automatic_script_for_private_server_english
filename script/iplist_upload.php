@@ -31,14 +31,18 @@ if (isset($_POST['upload_csv']) && isset($_FILES['csv_file'])) {
             }));
             if ($csv_data && count($csv_data) > 0) {
                 $csv_table = "<div class='note'>";
-                $csv_table .= "<div class='note-title'>Uploaded CSV Content (First 10 Rows Displayed)</div>";
+                //$csv_table .= "<div class='note-title'>Uploaded CSV Content (First 10 Rows Displayed)</div>";
+				$csv_table .= "<div class='note-title'>Uploaded CSV Content</div>";
                 $csv_table .= "<table class='styled-table'>";
                 $csv_table .= "<thead><tr>";
+				// display a Header
                 foreach ($csv_data[0] as $header) {
                     $csv_table .= "<th>" . htmlspecialchars($header) . "</th>";
                 }
                 $csv_table .= "</tr></thead><tbody>";
-                $max_rows = min(count($csv_data), 11);
+				// display a Data
+                //$max_rows = min(count($csv_data), 11);
+				$max_rows = count($csv_data);
                 for ($i = 1; $i < $max_rows; $i++) {
                     $csv_table .= "<tr>";
                     foreach ($csv_data[$i] as $cell) {
@@ -262,12 +266,10 @@ if (isset($_GET['run_script'])) {
 <body>
 
 <div class="container">
+	<a href="../portal/index.php" class="menu-link">☎ HOME</a>
     <h1>AP IP Batch Change Script Execution</h1>
-    <p>
-        <a href="../portal/index.php" class="menu-link">☎ HOME</a><p>
-        <a href="./iplist_upload.php?reset=1" class="menu-link">◀ Reset Script</a><p>
+        <a href="./iplist_upload.php?reset=1" class="menu-link">◀ Reset Script</a><br>
         <a href='./example/sample.csv' class="menu-link" download>📁 Download Sample CSV File</a>
-    </p>
 
     <form method="post" enctype="multipart/form-data">
         <h3>Upload AP IP List File (CSV)</h3>
@@ -379,4 +381,5 @@ if (isset($_GET['run_script'])) {
 
 </body>
 </html>
+
 
