@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['community']) && isset
     <?php if (empty($output1) && empty($output2) && !isset($_POST['community'])) { ?>
         <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
 			<a href="../portal/index.php" class="menu-link">☎ HOME</a>
-            <h1 class="text-2xl font-bold text-center mb-6">ICX ARP Query</h1>
+            <h1 class="text-2xl font-bold text-center mb-6" style="color: #d9534f;">ICX ARP Query</h1>
             <br>
             <form action="index.php" method="post" class="space-y-4">
                 <div>
