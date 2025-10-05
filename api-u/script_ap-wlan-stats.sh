@@ -5,7 +5,7 @@ UAP=$1
 UAP_USERNAME=$2
 UAP_PASSWORD=$3
 
-mkdir ./$UAP
+mkdir -p ./$UAP
 
 # create a cookie jar
 UAP_COOKIE=$(mktemp)
@@ -30,7 +30,7 @@ curl $UAP_CONF -H "X-CSRF-Token: $UAP_XSS" -k -s -b $UAP_COOKIE -c $UAP_COOKIE -
 rm $UAP_COOKIE
 
 # create download folder
-mkdir ./$UAP/download
+mkdir -p ./$UAP/download
 
 # XML file name
 ap_XML_FILE="./$UAP/ap-result.xml"
