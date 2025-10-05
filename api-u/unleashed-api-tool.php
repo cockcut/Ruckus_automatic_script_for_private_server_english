@@ -26,7 +26,14 @@ function show_form($error = '') {
         .menu-link:hover {
             background-color: #e2e6ea;
         }
-        h1, h2, h3 { color: #1a1a1a; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+		h1 {
+            color: #d9534f;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h2, h3 { color: #1a1a1a; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
         form { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         label { font-weight: bold; display: block; margin-bottom: 5px; }
         input[type="text"], input[type="password"] { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
@@ -240,4 +247,5 @@ if (isset($_POST['uip']) && isset($_POST['username']) && isset($_POST['password'
 } else {
     show_form();
 }
+
 ?>
