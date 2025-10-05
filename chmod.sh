@@ -28,8 +28,8 @@ CRON_JOB="0 0 * * * $OUIGET_SCRIPT"
 # Get the current crontab list
 (crontab -l 2>/dev/null) > my_crontab_jobs
 
-# Check if the job already exists
-if ! grep -qF -- "$CRON_JOB" my_crontab_jobs; then
+# Check if the job or ouiget.sh already exists
+if ! grep -qE -- "$(printf '%s|%s' "$CRON_JOB" 'ouiget.sh')" my_crontab_jobs; then
   # If the job does not exist, add it
   echo "$CRON_JOB" >> my_crontab_jobs
 
