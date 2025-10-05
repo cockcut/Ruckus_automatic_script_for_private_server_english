@@ -1,7 +1,14 @@
 <?php
 session_start();
 
-$upload_dir = 'Uploads/';
+// Reset session if requested
+if (isset($_GET['reset'])) {
+    unset($_SESSION['csv_path']);
+    unset($_SESSION['csv_table']);
+    $csv_upload_message = "🔄 이전 업로드 내용이 초기화되었습니다. 새로운 CSV 파일을 업로드하세요.";
+}
+
+$upload_dir = 'uploads/';
 if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0777, true);
 }
@@ -361,3 +368,4 @@ if (isset($_GET['run_upgrade'])) {
 
 </body>
 </html>
+
