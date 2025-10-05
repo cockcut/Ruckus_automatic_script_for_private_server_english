@@ -5,7 +5,7 @@ session_start();
 if (isset($_GET['reset'])) {
     unset($_SESSION['csv_path']);
     unset($_SESSION['csv_table']);
-    $csv_upload_message = "🔄 이전 업로드 내용이 초기화되었습니다. 새로운 CSV 파일을 업로드하세요.";
+    $csv_upload_message = "🔄 Previous upload content has been reset. Please upload a new CSV file.";
 }
 
 $upload_dir = 'uploads/';
@@ -244,6 +244,7 @@ if (isset($_GET['run_upgrade'])) {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+			font-size: 12px;
         }
         .styled-table th, .styled-table td {
             border: 1px solid #ddd;
@@ -266,21 +267,24 @@ if (isset($_GET['run_upgrade'])) {
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+		form { 
+			background: #f9f9f9;
+			padding: 20px;
+			border-radius: 8px;
+			margin-bottom: 20px; 
+		}
     </style>
 </head>
 <body>
 
 <div class="container">
+	<a href="../portal/index.php" class="menu-link">☎ HOME</a>
     <h1>AP Firmware Upgrade</h1>
 	<center>★ Downloads use HTTP port 8080 on the PC. Please allow TCP 8080 on the PC. ★</center>
-    <p>
-        <a href="../portal/index.php" class="menu-link">☎ HOME</a><p>
-        <a href="./upgrade.php" class="menu-link">◀ Reset Script</a><p>
+        <a href="./upgrade.php" class="menu-link">◀ Reset Script</a><br>
         <a href='./example/fw_sample.csv' class="menu-link" download>📁 Download Sample CSV File</a>
-    </p>
-
+	<h3>Upload AP IP List File (CSV)</h3>
     <form method="post" enctype="multipart/form-data">
-        <h3>Upload AP IP List File (CSV)</h3>
         <input type="file" name="csv_file" accept=".csv" required>
         <input type="submit" name="upload_csv" value="Upload AP List">
     </form>
@@ -291,6 +295,31 @@ if (isset($_GET['run_upgrade'])) {
 
     <?php if (isset($_SESSION['csv_table'])): ?>
         <?php echo $_SESSION['csv_table']; ?>
+    <?php else: // 👈 Display example table when no content is uploaded
+        $sample_csv_data = array(
+            array("ip", "user", "pass", "fw_server_ip"),
+            array("10.10.10.10", "super", "sp-admin", "192.168.0.100"),
+            array("10.10.20.20", "super", "sp-admin", "192.168.0.100"),
+            array("10.10.200.200", "super", "sp-admin", "192.168.0.100")
+        );
+        $sample_table = "<div class='note'>";
+        $sample_table .= "<div class='note-title'>※ The following shows an example of the contents of fw_sample.csv. Please download and edit the sample CSV above, then upload it."</div>";
+        $sample_table .= "<table class='styled-table'>";
+        $sample_table .= "<thead><tr>";
+        foreach ($sample_csv_data[0] as $header) {
+            $sample_table .= "<th>" . htmlspecialchars($header) . "</th>";
+        }
+        $sample_table .= "</tr></thead><tbody>";
+        for ($i = 1; $i < count($sample_csv_data); $i++) {
+            $sample_table .= "<tr>";
+            foreach ($sample_csv_data[$i] as $cell) {
+                $sample_table .= "<td>" . htmlspecialchars($cell) . "</td>";
+            }
+            $sample_table .= "</tr>";
+        }
+        $sample_table .= "</tbody></table></div>";
+        echo $sample_table;
+    ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['csv_path'])): ?>
@@ -368,4 +397,5 @@ if (isset($_GET['run_upgrade'])) {
 
 </body>
 </html>
+
 
