@@ -35,11 +35,11 @@ HEADER_AND_CSS='
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #0056b3;
+            color: #d9534f;
             text-align: center;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 2px solid #eee;
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-top: 0;
         }
         h2 {
             color: #333;
@@ -137,11 +137,19 @@ INDEX_CONTENT=$(cat << EOF
     border-bottom: 3px solid #007bff;
     margin-bottom: 30px;
   }
+  h1 {
+	color: #d9534f;
+	text-align: center;
+	border-bottom: 2px solid #eee;
+	padding-bottom: 10px;
+	margin-top: 0;
+ }
   header h1 {
-    font-size: 2.5em;
-    color: #2c3e50;
-    margin: 0;
-    font-weight: 600;
+            color: #d9534f;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
   }
   header p {
     font-size: 1.1em;
