@@ -33,6 +33,7 @@ proc process_device {ip user pass new_ip subnet gw sz hostname operation} {
     global result_list
     set mac_addr ""
     set serial ""
+    set status_msg ""
     # Extract Serial and MAC address
     send "get boarddata\r"
     sleep 1
@@ -43,37 +44,58 @@ proc process_device {ip user pass new_ip subnet gw sz hostname operation} {
             puts "Serial: $serial"
             puts "mac_addr: $mac_addr"
         }
+        timeout {
+            puts "(Timeout occurred while fetching boarddata for $ip.)"
+            set status_msg "(Timeout occurred while fetching boarddata for $ip.)"
+            lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+            return 0
+        }
     }
     expect {
         -re "rkscli" {
-            puts "(Serial# of $ip: $serial, MAC address: $mac_addr)"
+            puts "(Serial#: $serial, MAC Address: $mac_addr for $ip)"
+        }
+        timeout {
+            puts "(Timeout occurred waiting for rkscli prompt on $ip.)"
+            set status_msg "(Timeout occurred waiting for rkscli prompt on $ip.)"
+            lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+            return 0
         }
     }
 
     # Operation-specific commands
     switch $operation {
         "connect_sz" {
-            puts "(Setting SZ IP of $ip to $sz.)"
+            puts "(Setting SZ IP to $sz for $ip.)"
             send "set scg ip $sz\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(Changed SZ IP of $ip to $sz.)"
+                    puts "(SZ IP for $ip changed to $sz.)"
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: set scg ip $sz command successful: $expect_out(0,string)"
+                        puts "Debugging: set scg ip $sz command successful: $expect_out(0,string)"
                     }
                     # Verify SZ IP
                     send "get scg\r"
                     expect {
                         -re "Server List:.*$sz.*rkscli" {
-                            puts "(Verified changed SZ IP of $ip to $sz.)"
+                            set status_msg "(Changed SZ IP for $ip confirmed as $sz.)"
+                            puts $status_msg
                             if {[info exists ::DEBUG_LOG]} {
-                                puts "Debug: get scg output: $expect_out(0,string)"
+                                puts "Debugging: get scg output: $expect_out(0,string)"
                             }
+                        }
+                        timeout {
+                            puts "(Timeout occurred while verifying SZ IP for $ip.)"
+                            set status_msg "(Timeout occurred while verifying SZ IP for $ip.)"
+                            lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                            return 0
                         }
                     }
                 }
                 timeout {
-                    puts "(Timeout occurred while setting SZ IP of $ip.)"
+                    puts "(Timeout occurred while setting SZ IP for $ip.)"
+                    set status_msg "(Timeout occurred while setting SZ IP for $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
                     return 0
                 }
             }
@@ -84,74 +106,85 @@ proc process_device {ip user pass new_ip subnet gw sz hostname operation} {
             send "reboot\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(Reboot command executed for $ip.)"
+                    set status_msg "(Reboot command executed on $ip.)"
+                    puts $status_msg
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: rkscli prompt received after reboot command."
+                        puts "Debugging: rkscli prompt received after reboot command."
                     }
+                }
+                timeout {
+                    puts "(Timeout occurred during reboot on $ip.)"
+                    set status_msg "(Timeout occurred during reboot on $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                    return 0
                 }
             }
         }
         "factory_reset" {
-            puts "(Factory resetting AP $ip.)"
+            puts "(Factory resetting $ip.)"
             set timeout 10
             send "set factory\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(Factory reset command completed for AP $ip.)"
+                    puts "(Factory reset command completed on $ip.)"
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: set factory command successful: $expect_out(0,string)"
+                        puts "Debugging: set factory command successful: $expect_out(0,string)"
                     }
                 }
                 timeout {
-                    puts "(Timeout occurred during factory reset of $ip.)"
+                    puts "(Timeout occurred during factory reset on $ip.)"
+                    set status_msg "(Timeout occurred during factory reset on $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
                     return 0
                 }
             }
             send "reboot\r"
             expect {
                 -re "rkscli" {
-                    puts "(Factory reset completed and reboot command executed for AP $ip.)"
+                    set status_msg "(Factory reset completed and reboot command executed on $ip.)"
+                    puts $status_msg
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: rkscli prompt received after reboot command."
+                        puts "Debugging: rkscli prompt received after reboot command."
                     }
                 }
                 timeout {
-                    puts "(Timeout occurred during reboot of $ip.)"
+                    puts "(Timeout occurred during reboot on $ip.)"
+                    set status_msg "(Timeout occurred during reboot on $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
                     return 0
                 }
                 eof {
-                    puts "(Reboot command sent for $ip, connection closed.)"
-                    if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: Connection closed due to reboot command."
-                    }
+                    puts "(Reboot command sent, connection closed for $ip.)"
+                    set status_msg "(Reboot command sent, connection closed for $ip.)"
                 }
             }
         }
         "changeip" {
-            puts "(Changing $ip to $new_ip.)"
+            puts "(Changing IP address of $ip to $new_ip.)"
             set timeout 5
             send "set ipaddr wan $new_ip $subnet $gw\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(Changed $ip to $new_ip.)"
+                    set status_msg "(IP address of $ip changed to $new_ip.)"
+                    puts $status_msg
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: set ipaddr wan $new_ip $subnet $gw command successful: $expect_out(0,string)"
+                        puts "Debugging: set ipaddr wan $new_ip $subnet $gw command successful: $expect_out(0,string)"
                     }
                     # Skip get ipaddr due to potential connection loss
-                    puts "(Verification skipped after IP change for $ip, possible connection loss.)"
+                    puts "(Skipping IP verification after change for $ip, connection loss possible.)"
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: get ipaddr skipped, connection stability uncertain after IP change."
+                        puts "Debugging: Skipping get ipaddr, connection unreliable after IP change."
                     }
                 }
                 timeout {
-                    puts "($ip IP change interrupted, moving to next device.)"
-#                    return 0
+                    puts "(Connection interrupted during IP change for $ip. Moving to next device.)"
+                    set status_msg "(Connection interrupted during IP change for $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                    return 0
                 }
                 eof {
-                    puts "(IP change command sent for $ip, connection closed.)"
-                    if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: Connection closed due to set ipaddr wan command."
-                    }
+                    puts "(IP change command sent, connection closed for $ip.)"
+                    set status_msg "(IP change command sent, connection closed for $ip.)"
                 }
             }
             set timeout 5
@@ -162,69 +195,102 @@ proc process_device {ip user pass new_ip subnet gw sz hostname operation} {
             send "set device-name $hostname\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(Changed hostname of $ip to \"$hostname\".)"
+                    set status_msg "(Hostname of $ip changed to \"$hostname\".)"
+                    puts $status_msg
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: set device-name $hostname command successful: $expect_out(0,string)"
+                        puts "Debugging: set device-name $hostname command successful: $expect_out(0,string)"
                     }
                     # Verify device name
-					set timeout 3
+                    set timeout 3
                     send "get device-name\r"
                     expect {
                         -re "device name.:.*$hostname.*rkscli|Device Name.:.*$hostname.*rkscli" {
-                            puts "(Verified changed hostname of $ip to \"$hostname\".)"
+                            puts "(Changed hostname for $ip confirmed as \"$hostname\".)"
                             if {[info exists ::DEBUG_LOG]} {
-                                puts "Debug: get device-name output: $expect_out(0,string)"
+                                puts "Debugging: get device-name output: $expect_out(0,string)"
                             }
                         }
                         timeout {
                             puts "(Timeout occurred while verifying hostname setting for $ip.)"
+                            set status_msg "(Timeout occurred while verifying hostname setting for $ip.)"
+                            lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
                             return 0
                         }
                     }
                 }
+                timeout {
+                    puts "(Timeout occurred while setting hostname for $ip.)"
+                    set status_msg "(Timeout occurred while setting hostname for $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                    return 0
+                }
             }
         }
         "sz_devicename_changeip" {
-            puts "(Setting SZ IP of $ip to $sz, hostname to \"$hostname\", and IP to $new_ip.)"
+            puts "(Setting SZ IP to $sz, hostname to \"$hostname\", and IP to $new_ip for $ip.)"
             set timeout 10
             # Set SCG IP
             send "set scg ip $sz\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(SZ IP setting completed for $ip.)"
+                    puts "(SZ IP set for $ip completed.)"
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: set scg ip $sz command successful: $expect_out(0,string)"
+                        puts "Debugging: set scg ip $sz command successful: $expect_out(0,string)"
                     }
                     # Verify SZ IP
                     send "get scg\r"
                     expect {
                         -re "Server List:.*$sz.*rkscli" {
-                            puts "(SZ IP of $ip verified as $sz.)"
+                            puts "(SZ IP for $ip confirmed as $sz.)"
                             if {[info exists ::DEBUG_LOG]} {
-                                puts "Debug: get scg output: $expect_out(0,string)"
+                                puts "Debugging: get scg output: $expect_out(0,string)"
                             }
                         }
+                        timeout {
+                            puts "(Timeout occurred while verifying SZ IP for $ip.)"
+                            set status_msg "(Timeout occurred while verifying SZ IP for $ip.)"
+                            lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                            return 0
+                        }
                     }
+                }
+                timeout {
+                    puts "(Timeout occurred while setting SZ IP for $ip.)"
+                    set status_msg "(Timeout occurred while setting SZ IP for $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                    return 0
                 }
             }
             # Set device name
             send "set device-name $hostname\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(Hostname setting completed for $ip.)"
+                    puts "(Hostname set for $ip completed.)"
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: set device-name $hostname command successful: $expect_out(0,string)"
+                        puts "Debugging: set device-name $hostname command successful: $expect_out(0,string)"
                     }
                     # Verify device name
                     send "get device-name\r"
                     expect {
                         -re "Device Name:.*$hostname.*rkscli" {
-                            puts "(Hostname of $ip verified as \"$hostname\".)"
+                            puts "(Hostname for $ip confirmed as \"$hostname\".)"
                             if {[info exists ::DEBUG_LOG]} {
-                                puts "Debug: get device-name output: $expect_out(0,string)"
+                                puts "Debugging: get device-name output: $expect_out(0,string)"
                             }
                         }
+                        timeout {
+                            puts "(Timeout occurred while verifying hostname setting for $ip.)"
+                            set status_msg "(Timeout occurred while verifying hostname setting for $ip.)"
+                            lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                            return 0
+                        }
                     }
+                }
+                timeout {
+                    puts "(Timeout occurred while setting hostname for $ip.)"
+                    set status_msg "(Timeout occurred while setting hostname for $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+                    return 0
                 }
             }
             # Set IP address
@@ -232,44 +298,50 @@ proc process_device {ip user pass new_ip subnet gw sz hostname operation} {
             send "set ipaddr wan $new_ip $subnet $gw\r"
             expect {
                 -re "OK\r\n.*rkscli" {
-                    puts "(IP change completed for $ip.)"
+                    puts "(IP change for $ip completed.)"
+                    set status_msg "(Change for $ip to SZ-$sz, Hostname-$hostname, IP-$new_ip completed.)"
+                    puts $status_msg
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: set ipaddr wan $new_ip $subnet $gw command successful: $expect_out(0,string)"
+                        puts "Debugging: set ipaddr wan $new_ip $subnet $gw command successful: $expect_out(0,string)"
                     }
                     # Skip get ipaddr due to potential connection loss
-                    puts "(Verification skipped after IP change for $ip, possible connection loss.)"
+                    puts "(Skipping IP verification after change for $ip, connection loss possible.)"
                     if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: get ipaddr skipped, connection stability uncertain after IP change."
+                        puts "Debugging: Skipping get ipaddr, connection unreliable after IP change."
                     }
                 }
                 timeout {
                     puts "(Timeout occurred during IP change for $ip.)"
+                    set status_msg "(Timeout occurred during IP change for $ip.)"
+                    lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
                     return 0
                 }
                 eof {
-                    puts "(IP change command sent for $ip, connection closed.)"
-                    if {[info exists ::DEBUG_LOG]} {
-                        puts "Debug: Connection closed due to set ipaddr wan command."
-                    }
+                    puts "(IP change command sent, connection closed for $ip.)"
+                    set status_msg "(IP change command sent, connection closed for $ip.)"
                 }
             }
             set timeout 5
         }
         default {
             puts "Unknown operation: $operation"
+            set status_msg "(Unknown operation: $operation)"
+            lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
             exit 1
         }
     }
 
-    # Append to result list
-    lappend result_list "$new_ip,$subnet,$gw,$sz,$hostname,$serial,$mac_addr,$ip,$user,$pass"
-    puts "(Moving to next device.)"
+    # Append to result list if status_msg is set (success or specific failure)
+    if {$status_msg != ""} {
+        lappend result_list "$ip,$status_msg,$serial,$mac_addr,$user,$pass"
+    }
+    puts "(Moving to the next device.)"
     return 1
 }
 
 # Open CSV file
 if {[catch {set fp [open $filename r]} err]} {
-    puts "Error: Unable to open CSV file $filename: $err"
+    puts "Error: Could not open CSV file $filename: $err"
     exit 1
 }
 
@@ -281,7 +353,7 @@ while {[gets $fp line] >= 0} {
     # Skip empty lines
     if {$line == ""} {
         if {[info exists ::DEBUG_LOG]} {
-            puts "Debug: Skipping empty line (line [expr {$index + 1}])."
+            puts "Debugging: Skipping empty line (line [expr {$index + 1}])."
         }
         continue
     }
@@ -294,7 +366,7 @@ while {[gets $fp line] >= 0} {
 
     # Log the raw line for debugging
     if {[info exists ::DEBUG_LOG]} {
-        puts "Debug: Line $index - Raw: '$line'"
+        puts "Debugging: Line $index - Original: '$line'"
     }
 
     # Split fields by comma
@@ -313,14 +385,14 @@ while {[gets $fp line] >= 0} {
     }
     if {$all_empty} {
         if {[info exists ::DEBUG_LOG]} {
-            puts "Debug: Line $index - All fields are empty: '$line'"
+            puts "Debugging: Line $index - All fields are empty: '$line'"
         }
         continue
     }
 
     # Log fields for debugging
     if {[info exists ::DEBUG_LOG]} {
-        puts "Debug: Line $index - Fields: [join $fields "|"]"
+        puts "Debugging: Line $index - Fields: [join $fields "|"]"
     }
 
     # Validate number of fields
@@ -339,29 +411,36 @@ while {[gets $fp line] >= 0} {
     set sz [string trim [lindex $fields 6]]
     set hostname [string trim [lindex $fields 7]]
 
+    # Initialize serial and mac_addr to avoid undefined variable errors
+    set serial ""
+    set mac_addr ""
+
     # Validate IP addresses (basic check)
     if {$ip == "" || ($operation != "connect_sz" && $operation != "reboot" && $operation != "factory_reset" && $new_ip == "")} {
         puts "Error: Line $index - IP address is empty: '$line'"
+        lappend result_list "$ip,(Error: Line $index - IP address is empty.),$serial,$mac_addr,$user,$pass"
         continue
     }
 
     # Validate SZ IP for connect_sz and sz_devicename_changeip
     if {($operation == "connect_sz" || $operation == "sz_devicename_changeip") && $sz == ""} {
         puts "Error: Line $index - SZ IP is empty: '$line'"
+        lappend result_list "$ip,(Error: Line $index - SZ IP is empty.),$serial,$mac_addr,$user,$pass"
         continue
     }
 
     # Validate hostname for devicename and sz_devicename_changeip
     if {($operation == "devicename" || $operation == "sz_devicename_changeip") && $hostname == ""} {
         puts "Error: Line $index - hostname is empty: '$line'"
+        lappend result_list "$ip,(Error: Line $index - hostname is empty.),$serial,$mac_addr,$user,$pass"
         continue
     }
 
     # Print processing message
-    puts "Processing: $ip (performing $operation...)"
+    puts "Processing: $ip (Operation: $operation...)"
 
     # SSH connection
-	set timeout 5
+    set timeout 5
     spawn ssh -o StrictHostKeyChecking=no -o HostKeyAlgorithms=+ssh-rsa -o ForwardX11=no $user@$ip
     sleep 2
 
@@ -374,7 +453,8 @@ while {[gets $fp line] >= 0} {
                     send "$pass\r"
                 }
                 timeout {
-                    puts "(Timeout waiting for password prompt for $ip.)"
+                    puts "(Password prompt timeout on $ip.)"
+                    lappend result_list "$ip,(Password prompt timeout on $ip.),$serial,$mac_addr,$user,$pass"
                     close
                     wait
                     continue
@@ -385,19 +465,22 @@ while {[gets $fp line] >= 0} {
             send "$pass\r"
         }
         "ssh: connect to host" {
-            puts "(Unable to connect to $ip. Moving to next device.)"
+            puts "(Could not connect to $ip. Moving to the next device.)"
+            lappend result_list "$ip,(Could not connect to $ip.),$serial,$mac_addr,$user,$pass"
             close
             wait
             continue
         }
-		"Connection closed*" {
-		    puts "(Connection closed by $ip. Moving to next device.)"
+        "Connection closed*" {
+            puts "(Connection closed by $ip. Moving to the next device.)"
+            lappend result_list "$ip,(Connection closed by $ip.),$serial,$mac_addr,$user,$pass"
             close
             wait
             continue
-		}
+        }
         timeout {
-            puts "(Connection timeout for $ip. Moving to next device.)"
+            puts "(Connection to $ip timed out. Moving to the next device.)"
+            lappend result_list "$ip,(Connection to $ip timed out.),$serial,$mac_addr,$user,$pass"
             close
             wait
             continue
@@ -409,7 +492,8 @@ while {[gets $fp line] >= 0} {
                     send "$pass\r"
                 }
                 timeout {
-                    puts "(Timeout waiting for password prompt for $ip.)"
+                    puts "(Password prompt timeout on $ip.)"
+                    lappend result_list "$ip,(Password prompt timeout on $ip.),$serial,$mac_addr,$user,$pass"
                     close
                     wait
                     continue
@@ -422,7 +506,8 @@ while {[gets $fp line] >= 0} {
     expect {
         # 0) Unleashed device
         -re "(ruckus>|ruckus#)" {
-            puts "($ip -> Unleashed devices are not supported by this script. Moving to next device.)"
+            puts "($ip -> This script is not applicable to Unleashed devices. Moving to the next device.)"
+            lappend result_list "$ip,(This script is not applicable to Unleashed devices.),$serial,$mac_addr,$user,$pass"
             close
             wait
             continue
@@ -434,7 +519,8 @@ while {[gets $fp line] >= 0} {
             close
             wait
             if {$result == 0} {
-                puts "(Error occurred while processing $ip, moving to next device.)"
+                puts "(Error occurred while processing $ip, moving to the next device.)"
+                lappend result_list "$ip,(Error occurred while processing $ip.),$serial,$mac_addr,$user,$pass"
             }
             continue
         }
@@ -442,7 +528,7 @@ while {[gets $fp line] >= 0} {
         -re "Login incorrect" {
             expect {
                 -re "Please login" {
-                    puts "(Login failed for $ip, trying with sp-admin.)"
+                    puts "(Login failed for $ip, attempting with sp-admin.)"
                     sleep 2
                     send "$user\r"
                     expect {
@@ -450,7 +536,8 @@ while {[gets $fp line] >= 0} {
                             send "sp-admin\r"
                         }
                         timeout {
-                            puts "(Timeout waiting for sp-admin login prompt for $ip.)"
+                            puts "(sp-admin login prompt timeout on $ip.)"
+                            lappend result_list "$ip,(sp-admin login prompt timeout on $ip.),$serial,$mac_addr,$user,sp-admin"
                             close
                             wait
                             continue
@@ -460,11 +547,12 @@ while {[gets $fp line] >= 0} {
                         # 2-1) sp-admin correct
                         -re "rkscli" {
                             sleep 1
-                            set result [process_device $ip $user $pass $new_ip $subnet $gw $sz $hostname $operation]
+                            set result [process_device $ip $user "sp-admin" $new_ip $subnet $gw $sz $hostname $operation]
                             close
                             wait
                             if {$result == 0} {
-                                puts "(Error occurred while processing $ip, moving to next device.)"
+                                puts "(Error occurred while processing $ip, moving to the next device.)"
+                                lappend result_list "$ip,(Error occurred while processing $ip.),$serial,$mac_addr,$user,sp-admin"
                             }
                             continue
                         }
@@ -476,7 +564,8 @@ while {[gets $fp line] >= 0} {
                                     send "ruckus12#$\r"
                                 }
                                 timeout {
-                                    puts "(Timeout confirming password for $ip.)"
+                                    puts "(Password confirmation timeout on $ip.)"
+                                    lappend result_list "$ip,(Password confirmation timeout on $ip.),$serial,$mac_addr,$user,sp-admin"
                                     close
                                     wait
                                     continue
@@ -490,7 +579,8 @@ while {[gets $fp line] >= 0} {
                                             send "ruckus12#$\r"
                                         }
                                         timeout {
-                                            puts "(Timeout waiting for new password login prompt for $ip.)"
+                                            puts "(New password login prompt timeout on $ip.)"
+                                            lappend result_list "$ip,(New password login prompt timeout on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                                             close
                                             wait
                                             continue
@@ -499,16 +589,18 @@ while {[gets $fp line] >= 0} {
                                     expect {
                                         -re "rkscli" {
                                             sleep 1
-                                            set result [process_device $ip $user $pass $new_ip $subnet $gw $sz $hostname $operation]
+                                            set result [process_device $ip $user "ruckus12#$" $new_ip $subnet $gw $sz $hostname $operation]
                                             close
                                             wait
                                             if {$result == 0} {
-                                                puts "(Error occurred while processing $ip, moving to next device.)"
+                                                puts "(Error occurred while processing $ip, moving to the next device.)"
+                                                lappend result_list "$ip,(Error occurred while processing $ip.),$serial,$mac_addr,$user,ruckus12#$"
                                             }
                                             continue
                                         }
                                         timeout {
-                                            puts "(Timeout waiting for rkscli prompt for $ip.)"
+                                            puts "(rkscli prompt timeout on $ip.)"
+                                            lappend result_list "$ip,(rkscli prompt timeout on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                                             close
                                             wait
                                             continue
@@ -516,7 +608,8 @@ while {[gets $fp line] >= 0} {
                                     }
                                 }
                                 timeout {
-                                    puts "(Timeout waiting for new login prompt for $ip.)"
+                                    puts "(New login prompt timeout on $ip.)"
+                                    lappend result_list "$ip,(New login prompt timeout on $ip.),$serial,$mac_addr,$user,sp-admin"
                                     close
                                     wait
                                     continue
@@ -527,7 +620,7 @@ while {[gets $fp line] >= 0} {
                         -re "Login incorrect" {
                             expect {
                                 -re "Please login" {
-                                    puts "(Login failed for $ip, trying with ruckus12#$.)"
+                                    puts "(Login failed for $ip, attempting with ruckus12#$.)"
                                     sleep 2
                                     send "$user\r"
                                     expect {
@@ -535,7 +628,8 @@ while {[gets $fp line] >= 0} {
                                             send "ruckus12#$\r"
                                         }
                                         timeout {
-                                            puts "(Timeout waiting for ruckus12#$ login prompt for $ip.)"
+                                            puts "(ruckus12#$ login prompt timeout on $ip.)"
+                                            lappend result_list "$ip,(ruckus12#$ login prompt timeout on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                                             close
                                             wait
                                             continue
@@ -545,30 +639,34 @@ while {[gets $fp line] >= 0} {
                                         # 2-3-1) ruckus12#$ correct
                                         -re "rkscli" {
                                             sleep 1
-                                            set result [process_device $ip $user $pass $new_ip $subnet $gw $sz $hostname $operation]
+                                            set result [process_device $ip $user "ruckus12#$" $new_ip $subnet $gw $sz $hostname $operation]
                                             close
                                             wait
                                             if {$result == 0} {
-                                                puts "(Error occurred while processing $ip, moving to next device.)"
+                                                puts "(Error occurred while processing $ip, moving to the next device.)"
+                                                lappend result_list "$ip,(Error occurred while processing $ip.),$serial,$mac_addr,$user,ruckus12#$"
                                             }
                                             continue
                                         }
                                         # 2-3-2) ruckus12#$ incorrect
                                         -re "Login incorrect" {
-                                            puts "(Multiple login failures for $ip, moving to next device.)"
+                                            puts "(Login failed repeatedly for $ip, moving to the next device.)"
+                                            lappend result_list "$ip,(Login failed repeatedly.),$serial,$mac_addr,$user,ruckus12#$"
                                             close
                                             wait
                                             continue
                                         }
                                         # 2-3-3) ruckus12#$ with unleashed
                                         -re "(ruckus>|ruckus#)" {
-                                            puts "($ip -> Unleashed devices are not supported by this script. Moving to next device.)"
+                                            puts "($ip -> This script is not applicable to Unleashed devices. Moving to the next device.)"
+                                            lappend result_list "$ip,(This script is not applicable to Unleashed devices.),$serial,$mac_addr,$user,ruckus12#$"
                                             close
                                             wait
                                             continue
                                         }
                                         timeout {
-                                            puts "(Timeout after ruckus12#$ login for $ip.)"
+                                            puts "(Timeout after ruckus12#$ login on $ip.)"
+                                            lappend result_list "$ip,(Timeout after ruckus12#$ login on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                                             close
                                             wait
                                             continue
@@ -576,7 +674,8 @@ while {[gets $fp line] >= 0} {
                                     }
                                 }
                                 timeout {
-                                    puts "(Timeout after sp-admin login for $ip.)"
+                                    puts "(Timeout after sp-admin login on $ip.)"
+                                    lappend result_list "$ip,(Timeout after sp-admin login on $ip.),$serial,$mac_addr,$user,sp-admin"
                                     close
                                     wait
                                     continue
@@ -585,13 +684,15 @@ while {[gets $fp line] >= 0} {
                         }
                         # 2-4) sp-admin with unleashed
                         -re "(ruckus>|ruckus#)" {
-                            puts "($ip -> Unleashed devices are not supported by this script. Moving to next device.)"
+                            puts "($ip -> This script is not applicable to Unleashed devices. Moving to the next device.)"
+                            lappend result_list "$ip,(This script is not applicable to Unleashed devices.),$serial,$mac_addr,$user,sp-admin"
                             close
                             wait
                             continue
                         }
                         timeout {
-                            puts "(Timeout during sp-admin login processing for $ip.)"
+                            puts "(Timeout during sp-admin login process on $ip.)"
+                            lappend result_list "$ip,(Timeout during sp-admin login process on $ip.),$serial,$mac_addr,$user,sp-admin"
                             close
                             wait
                             continue
@@ -599,7 +700,8 @@ while {[gets $fp line] >= 0} {
                     }
                 }
                 timeout {
-                    puts "(Timeout waiting for login prompt for $ip.)"
+                    puts "(Login prompt timeout on $ip.)"
+                    lappend result_list "$ip,(Login prompt timeout on $ip.),$serial,$mac_addr,$user,$pass"
                     close
                     wait
                     continue
@@ -614,7 +716,8 @@ while {[gets $fp line] >= 0} {
                     send "ruckus12#$\r"
                 }
                 timeout {
-                    puts "(Timeout confirming password for $ip.)"
+                    puts "(Password confirmation timeout on $ip.)"
+                    lappend result_list "$ip,(Password confirmation timeout on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                     close
                     wait
                     continue
@@ -628,7 +731,8 @@ while {[gets $fp line] >= 0} {
                             send "ruckus12#$\r"
                         }
                         timeout {
-                            puts "(Timeout waiting for new password login prompt for $ip.)"
+                            puts "(New password login prompt timeout on $ip.)"
+                            lappend result_list "$ip,(New password login prompt timeout on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                             close
                             wait
                             continue
@@ -637,16 +741,18 @@ while {[gets $fp line] >= 0} {
                     expect {
                         -re "rkscli" {
                             sleep 1
-                            set result [process_device $ip $user $pass $new_ip $subnet $gw $sz $hostname $operation]
+                            set result [process_device $ip $user "ruckus12#$" $new_ip $subnet $gw $sz $hostname $operation]
                             close
                             wait
                             if {$result == 0} {
-                                puts "(Error occurred while processing $ip, moving to next device.)"
+                                puts "(Error occurred while processing $ip, moving to the next device.)"
+                                lappend result_list "$ip,(Error occurred while processing $ip.),$serial,$mac_addr,$user,ruckus12#$"
                             }
                             continue
                         }
                         timeout {
-                            puts "(Timeout waiting for rkscli prompt for $ip.)"
+                            puts "(rkscli prompt timeout on $ip.)"
+                            lappend result_list "$ip,(rkscli prompt timeout on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                             close
                             wait
                             continue
@@ -654,7 +760,8 @@ while {[gets $fp line] >= 0} {
                     }
                 }
                 timeout {
-                    puts "(Timeout waiting for new login prompt for $ip.)"
+                    puts "(New login prompt timeout on $ip.)"
+                    lappend result_list "$ip,(New login prompt timeout on $ip.),$serial,$mac_addr,$user,ruckus12#$"
                     close
                     wait
                     continue
@@ -662,7 +769,8 @@ while {[gets $fp line] >= 0} {
             }
         }
         timeout {
-            puts "(Timeout during login processing for $ip.)"
+            puts "(Timeout occurred during login process on $ip.)"
+            lappend result_list "$ip,(Timeout occurred during login process on $ip.),$serial,$mac_addr,$user,$pass"
             close
             wait
             continue
@@ -672,15 +780,28 @@ while {[gets $fp line] >= 0} {
 
 close $fp
 
-# Write results to CSV
+# Write results to CSV with UTF-8 BOM
 if {[catch {set result_fp [open $result_file w]} err]} {
-    puts "Error: Unable to open result file $result_file: $err"
+    puts "Error: Could not open result file $result_file: $err"
     exit 1
 }
-puts $result_fp "static_IP,Subnet,GW,SZ,Hostname,Serial,MAC_Address,old_dhcp_IP,User,Pass"
+
+# 1. Explicitly set file channel encoding to UTF-8 (Most important) - Comment out on centos, Rocky.
+#fconfigure $result_fp -encoding utf-8
+
+# 2. Write the BOM character \uFEFF. (This is key to prevent Korean characters from breaking in Excel.) - Use \xEF\xBB\xBF on centos, Rocky.
+#    The puts -nonewline command must be used so the BOM character is at the very start of the file without a newline.
+#puts -nonewline $result_fp "\uFEFF"
+puts -nonewline $result_fp "\xEF\xBB\xBF"
+
+# 3. Write the CSV header.
+#    The Status (result message) field is added as the second column to the original header.
+puts $result_fp "IP,Status,Serial,MAC_Address,User,Pass"
+
+# 4. Write the result list
 foreach result $result_list {
     puts $result_fp $result
 }
 close $result_fp
 
-puts "\n※ Script execution completed.\n"
+puts "\n※ Script finished.\n"
